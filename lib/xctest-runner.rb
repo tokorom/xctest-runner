@@ -57,16 +57,16 @@ class XCTestRunner
   end
 
   def clean
-    execute_command(clean_command)
+    execute_command(clean_command, true)
   end
 
   def build
-    execute_command(build_command)
+    execute_command(build_command, true)
   end
 
   def test(test_class)
     command = test_command(test_class)
-    execute_command("#{command}")
+    execute_command(command, true)
   end
 
   def run

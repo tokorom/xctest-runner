@@ -2,8 +2,8 @@
 
 module Shell
 
-  def execute_command(command)
-    puts "$ #{command}\n\n"
+  def execute_command(command, need_puts = false)
+    puts "$ #{command}\n\n" if need_puts
     `#{command}`
   end
 

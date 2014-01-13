@@ -32,7 +32,8 @@ Gem::Specification.new do |s|
     "lib/xctest-runner/shell.rb",
     "lib/xctest-runner/version.rb",
     "spec/lib/xctest-runner_spec.rb",
-    "spec/spec_helper.rb"
+    "spec/spec_helper.rb",
+    "xctest-runner.gemspec"
   ]
   s.homepage = "http://github.com/tokorom/xctest-runner"
   s.licenses = ["MIT"]

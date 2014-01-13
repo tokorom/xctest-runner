@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.executables = ["xctest-runner"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
     ".document",
@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Guardfile",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
     "VERSION",
     "bin/xctest-runner",

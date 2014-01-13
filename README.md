@@ -12,10 +12,24 @@ $ gem install xctest-runner
 
 ## Usage
 
+### Simple usage
+
+```shell
+$ xctest-runner
+```
+
+xctest-runner may be able to find the appropriate Target automatically.
+
 ### If you would like to run a specific test case
 
 ```shell
-$ xctest-runner -target YourTestsTarget -test SampleTests/testSample
+$ xctest-runner -test SampleTests/testSample
+```
+
+### If you specify a target
+
+```shell
+$ xctest-runner -target YourTestsTarget
 ```
 
 ### If you specify a scheme

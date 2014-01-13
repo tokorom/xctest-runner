@@ -8,6 +8,8 @@ describe XCTestRunner do
       @last_command = command
       if command.include?('-showBuildSettings')
         build_settings
+      elsif command.include?('-list')
+        xcodebuild_list
       end
     end
 
@@ -19,6 +21,24 @@ describe XCTestRunner do
         Build settings for action test and target Tests:
             HOGE = "huga"
       EOS
+    end
+
+    def xcodebuild_list
+      <<-EOS
+        Information about project "PodSample":
+            Targets:
+                PodSample
+                PodSampleTests
+
+            Build Configurations:
+                Debug
+                Release
+
+            If no build configuration is specified and -scheme is not passed then "Release" is used.
+
+            Schemes:
+                PodSample
+              EOS
     end
   end
 
@@ -37,10 +57,11 @@ describe XCTestRunner do
     end
 
     it 'runs xcodebuild with default options' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
       expect(opts['-sdk']).to eq 'iphonesimulator'
       expect(opts['-arch']).to eq 'x86_64'
       expect(opts['-configuration']).to eq 'Debug'
+      expect(opts['-target']).to eq 'PodSampleTests'
     end
 
     it 'doese not run clean command' do
@@ -68,7 +89,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 5
       expect(opts['-workspace']).to eq 'Sample'
     end
   end
@@ -79,7 +100,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 5
       expect(opts['-project']).to eq 'Sample'
     end
   end
@@ -101,7 +122,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
       expect(opts['-sdk']).to eq 'iphoneos'
     end
   end
@@ -112,7 +133,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
       expect(opts['-arch']).to eq 'armv7'
     end
   end
@@ -123,7 +144,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
       expect(opts['-configuration']).to eq 'Release'
     end
   end
@@ -134,7 +155,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
     end
 
     it 'run test command with the specific test case' do
@@ -149,7 +170,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
     end
 
     it 'run clean command' do
@@ -166,7 +187,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 3
+      expect(opts.count).to eq 4
     end
 
     it 'run test command with the suffix' do

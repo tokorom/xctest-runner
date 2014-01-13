@@ -27,4 +27,24 @@ module BuildEnvironment
     ENV['DYLD_ROOT_PATH'] = ENV['SDK_DIR']
   end
 
+  def xcodebuild_list
+    execute_command("xcodebuild -list")
+  end
+
+  def default_target
+    target = nil
+    is_target = false
+
+    output = xcodebuild_list
+    output.each_line do |line|
+      line = line.strip
+      if line =~ /\w+:/
+        is_target = ('Targets:' == line)
+      elsif is_target
+        target = line if target.nil? || line.end_with?('Tests')
+      end
+    end
+    target ? target : 'Tests'
+  end
+
 end

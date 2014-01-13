@@ -54,6 +54,7 @@ class XCTestRunner
     (@workspace ? "-workspace #{@workspace} " : '') +
     (@project ? "-project #{@project} " : '') +
     (@target ? "-target #{@target} " : '') +
+    (@scheme.nil? && @target.nil? ? "-target #{default_target} " : '') +
     "-sdk #{@sdk} -arch #{@arch} -configuration #{@configuration}"
   end
 

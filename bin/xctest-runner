@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+# -*- encoding: utf-8 -*-
+
+if $0 == __FILE__
+  $:.unshift File.expand_path('../../lib', __FILE__)
+end
+
+require 'xctest-runner'
+require 'optparse'
+
+opts = {}
+opt = OptionParser.new
+opt.on('--scheme NAME', 'build the scheme NAME') {|v| opts[:scheme] = v }
+opt.on('--workspace NAME', 'build the workspace NAME') {|v| opts[:workspace] = v }
+opt.on('--project NAME', 'build the project NAME') {|v| opts[:project] = v }
+opt.on('--target NAME', 'build the target NAME') {|v| opts[:target] = v }
+opt.on('--sdk SDK', 'use SDK as the name or path of the base SDK when building the project') {|v| opts[:sdk] = v }
+opt.on('--arch ARCH', 'build each target for the architecture ARCH') {|v| opts[:arch] = v }
+opt.on('--configuration NAME', 'use the build configuration NAME for building each target') {|v| opts[:configuration] = v }
+opt.on('--test VAL', 'Self | All | None | <TestCaseClassName/testMethodName>') {|v| opts[:test] = v }
+opt.on('--clean', 'run clean action before build') {|v| opts[:clean] = true }
+opt.on_tail("-v", "--version", "Show version") { puts XCTestRunner::VERSION; exit }
+opt.parse!(ARGV)
+
+XCTestRunner.new(opts).run

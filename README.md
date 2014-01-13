@@ -1,4 +1,4 @@
-xctest-runner [![Gem Version](https://badge.fury.io/rb/xctest-runner.png)](http://badge.fury.io/rb/xctest-runner)
+xctest-runner [![Gem Version](https://badge.fury.io/rb/xctest-runner.png)](http://badge.fury.io/rb/xctest-runner) [![build](https://travis-ci.org/tokorom/xctest-runner.png?branch=master)](https://travis-ci.org/tokorom/xctest-runner)
 ===================
 
 The unit tests runner for xctest.  

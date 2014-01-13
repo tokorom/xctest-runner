@@ -48,3 +48,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.options = ['--charset', 'utf-8', '--line-numbers']
 end
+
+task :ci do
+  Rake::Task[:spec].invoke
+end

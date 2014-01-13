@@ -19,6 +19,7 @@ opt.on('--arch ARCH', 'build each target for the architecture ARCH') {|v| opts[:
 opt.on('--configuration NAME', 'use the build configuration NAME for building each target') {|v| opts[:configuration] = v }
 opt.on('--test VAL', 'Self | All | None | <TestCaseClassName/testMethodName>') {|v| opts[:test] = v }
 opt.on('--clean', 'run clean action before build') {|v| opts[:clean] = true }
+opt.on('--suffix STRING', 'add STRING to build command and xctest command') {|v| opts[:suffix] = v }
 opt.on_tail("-v", "--version", "Show version") { puts XCTestRunner::VERSION; exit }
 
 argv = []

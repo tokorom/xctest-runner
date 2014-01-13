@@ -18,6 +18,7 @@ class XCTestRunner
     @arch = opts[:arch] || 'x86_64'
     @configuration = opts[:configuration] || 'Debug'
     @test_class = opts[:test] || 'Self'
+    @suffix = opts[:suffix] || ''
 
     @env = current_environment(build_command)
   end
@@ -41,7 +42,7 @@ class XCTestRunner
     "#{xcodebuild} #{xcodebuild_option}"
   end
 
-  def test_command(test_class = 'Self')
+  def test_command(test_class)
     configure_environment(build_command)
     additional_options = "-NSTreatUnknownArgumentsAsOpen NO -ApplePersistenceIgnoreState YES"
     bundle_path = "#{@env['BUILT_PRODUCTS_DIR']}/#{@env['FULL_PRODUCT_NAME']}"
@@ -61,12 +62,12 @@ class XCTestRunner
   end
 
   def build
-    execute_command(build_command, true)
+    execute_command("#{build_command} #{@suffix}", true)
   end
 
-  def test(test_class)
+  def test(test_class = 'Self')
     command = test_command(test_class)
-    execute_command(command, true)
+    execute_command("#{command} #{@suffix}", true)
   end
 
   def run

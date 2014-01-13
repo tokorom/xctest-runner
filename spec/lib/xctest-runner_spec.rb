@@ -2,16 +2,23 @@ require 'xctest-runner'
 
 describe XCTestRunner do
   class XCTestRunner
-    def execute_command(command)
-      if command.include?('-showBuildSettings')
-        <<-EOS
-          Build settings from command line:
-              SDKROOT = iphonesimulator7.0
+    attr_accessor :last_command
 
-          Build settings for action test and target Tests:
-              HOGE = "huga"
-        EOS
+    def execute_command(command, need_puts = false)
+      @last_command = command
+      if command.include?('-showBuildSettings')
+        build_settings
       end
+    end
+
+    def build_settings
+      <<-EOS
+        Build settings from command line:
+            SDKROOT = iphonesimulator7.0
+
+        Build settings for action test and target Tests:
+            HOGE = "huga"
+      EOS
     end
   end
 
@@ -131,8 +138,8 @@ describe XCTestRunner do
     end
 
     it 'run test command with the specific test case' do
-      @runner.should_receive(:test).with('SampleTests/testCase')
       @runner.run
+      expect(@runner.last_command).to include '-XCTest SampleTests/testCase'
     end
   end
 
@@ -153,27 +160,42 @@ describe XCTestRunner do
     end
   end
 
+  context '-suffix option' do
+    before(:each) do
+      @runner = XCTestRunner.new({:suffix => 'OBJROOT=.'})
+    end
+
+    it 'has some build arguments' do
+      expect(opts.count).to eq 3
+    end
+
+    it 'run test command with the suffix' do
+      @runner.build
+      expect(@runner.last_command).to include ' OBJROOT=.'
+      @runner.test
+      expect(@runner.last_command).to include ' OBJROOT=.'
+    end
+  end
+
   context 'Build environment' do
     class XCTestRunner
-      def execute_command(command)
-        if command.include?('-showBuildSettings')
-          <<-EOS
-            Build settings from command line:
-                SDKROOT = iphonesimulator7.0
+      def build_settings
+        <<-EOS
+          Build settings from command line:
+              SDKROOT = iphonesimulator7.0
 
-            Build settings for action test and target Tests:
-                SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
-                SDK_DIR = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
-                BUILT_PRODUCTS_DIR = /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator
-                FULL_PRODUCT_NAME = Tests.xctest
+          Build settings for action test and target Tests:
+              SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
+              SDK_DIR = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
+              BUILT_PRODUCTS_DIR = /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator
+              FULL_PRODUCT_NAME = Tests.xctest
 
-            Build settings for action test and target Demo:
-                SDKROOT = xxx
-                SDK_DIR = xxx
-                BUILT_PRODUCTS_DIR = xxx
-                FULL_PRODUCT_NAME = Demo.app
-          EOS
-        end
+          Build settings for action test and target Demo:
+              SDKROOT = xxx
+              SDK_DIR = xxx
+              BUILT_PRODUCTS_DIR = xxx
+              FULL_PRODUCT_NAME = Demo.app
+        EOS
       end
     end
 
@@ -191,11 +213,11 @@ describe XCTestRunner do
 
     context 'test command' do
       it 'contains xctest command' do
-        expect(@runner.test_command).to include '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/Developer/usr/bin/xctest '
+        expect(@runner.test_command('Self')).to include '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/Developer/usr/bin/xctest '
       end
 
       it 'contains test bundle' do
-        expect(@runner.test_command).to include ' /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
+        expect(@runner.test_command('Self')).to include ' /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
       end
     end
   end

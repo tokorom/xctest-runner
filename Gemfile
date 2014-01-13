@@ -1,7 +1,5 @@
 source "http://rubygems.org"
 
-gem 'systemu'
-
 group :development do
   gem 'rspec'
   gem 'rdoc'

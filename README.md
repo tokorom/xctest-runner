@@ -41,13 +41,13 @@ $ xctest-runner -scheme YourScheme
 ### If you specify a workspace
 
 ```shell
-$ xctest-runner -workspace Sample.xcworkspace -target YourTestsTarget
+$ xctest-runner -workspace Sample.xcworkspace
 ```
 
 ### If you specify a project
 
 ```shell
-$ xctest-runner -workspace Sample.xcodeproj -target YourTestsTarget
+$ xctest-runner -project Sample.xcodeproj
 ```
 
 ## Advanced Usage
@@ -55,13 +55,13 @@ $ xctest-runner -workspace Sample.xcodeproj -target YourTestsTarget
 ### If you would like to use [xcpretty](https://github.com/mneorr/XCPretty)
 
 ```shell
-$ xctest-runner -target YourTestsTarget | xcpretty -c
+$ xctest-runner 2>&1 | xcpretty -c
 ```
 
 ### If you would like add your build options
 
 ```shell
-$ xctest-runner -target YourTestsTarget -suffix "OBJROOT=."
+$ xctest-runner -suffix "OBJROOT=."
 ```
 
 ## Copyright

@@ -204,6 +204,14 @@ describe XCTestRunner do
           Build settings from command line:
               SDKROOT = iphonesimulator7.0
 
+          Build settings for action test and target Demo:
+              SDKROOT = xxx
+              SDK_DIR = xxx
+              BUILT_PRODUCTS_DIR = xxx
+              FULL_PRODUCT_NAME = Demo.app
+              EXECUTABLE_FOLDER_PATH = Demo.app
+              EXECUTABLE_PATH = Demo.app/Demo
+
           Build settings for action test and target Tests:
               SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
               SDK_DIR = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
@@ -212,11 +220,6 @@ describe XCTestRunner do
               EXECUTABLE_FOLDER_PATH = Tests.xctest
               EXECUTABLE_PATH = Tests.xctest/Tests
 
-          Build settings for action test and target Demo:
-              SDKROOT = xxx
-              SDK_DIR = xxx
-              BUILT_PRODUCTS_DIR = xxx
-              FULL_PRODUCT_NAME = Demo.app
         EOS
       end
     end
@@ -229,7 +232,9 @@ describe XCTestRunner do
       it 'contains DYLD_ROOT_PATH' do
         env = @runner.current_environment('xcodebuild -showBuildSettings test')
         expect(env['SDKROOT']).to_not eq 'xxx'
-        expect(env['DYLD_ROOT_PATH']).to eq nil
+        expect(env['SDK_DIR']).to eq '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk'
+        expect(env['EXECUTABLE_FOLDER_PATH']).to eq 'Tests.xctest'
+        expect(env['EXECUTABLE_PATH']).to eq 'Tests.xctest/Tests'
       end
     end
 

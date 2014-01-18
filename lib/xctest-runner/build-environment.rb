@@ -9,11 +9,11 @@ module BuildEnvironment
     env = {}
     settings = execute_command("#{build_command} -showBuildSettings test")
     settings.each_line do |line|
-      if line =~ /^\s(.*)=(.*)/
+      if line.strip.start_with?('Build settings')
+        break if env.include?('EXECUTABLE_FOLDER_PATH') && env['EXECUTABLE_FOLDER_PATH'].end_with?('.xctest')
+      elsif line =~ /^\s(.*)=(.*)/
         variable, value = line.split('=')
-        variable = variable.strip
-        value = value.strip
-        env[variable] = value if (env[variable].nil? || env[variable].empty?)
+        env[variable.strip] = value.strip
       end
     end
     env

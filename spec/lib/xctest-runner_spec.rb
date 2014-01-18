@@ -43,7 +43,7 @@ describe XCTestRunner do
   end
 
   let(:opts) {
-    option = @runner.xcodebuild_option
+    option = @runner.build_option
     opts = {}
     option.scan(/(-\w+) (\w+)/) do |opt, value|
       opts[opt] = value
@@ -57,9 +57,8 @@ describe XCTestRunner do
     end
 
     it 'runs xcodebuild with default options' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
       expect(opts['-sdk']).to eq 'iphonesimulator'
-      expect(opts['-arch']).to eq 'x86_64'
       expect(opts['-configuration']).to eq 'Debug'
       expect(opts['-target']).to eq 'PodSampleTests'
     end
@@ -78,7 +77,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
       expect(opts['-scheme']).to eq 'Tests'
     end
   end
@@ -89,7 +88,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 5
+      expect(opts.count).to eq 4
       expect(opts['-workspace']).to eq 'Sample'
     end
   end
@@ -100,7 +99,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 5
+      expect(opts.count).to eq 4
       expect(opts['-project']).to eq 'Sample'
     end
   end
@@ -111,7 +110,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
       expect(opts['-target']).to eq 'Tests'
     end
   end
@@ -122,19 +121,19 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
       expect(opts['-sdk']).to eq 'iphoneos'
     end
   end
 
   context '-arch option' do
     before(:each) do
-      @runner = XCTestRunner.new({:arch => 'armv7'})
+      @runner = XCTestRunner.new({:arch => 'i386'})
     end
 
     it 'has some build arguments' do
       expect(opts.count).to eq 4
-      expect(opts['-arch']).to eq 'armv7'
+      expect(opts['-arch']).to eq 'i386'
     end
   end
 
@@ -144,7 +143,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
       expect(opts['-configuration']).to eq 'Release'
     end
   end
@@ -155,7 +154,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
     end
 
     it 'run test command with the specific test case' do
@@ -170,7 +169,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
     end
 
     it 'run clean command' do
@@ -187,7 +186,7 @@ describe XCTestRunner do
     end
 
     it 'has some build arguments' do
-      expect(opts.count).to eq 4
+      expect(opts.count).to eq 3
     end
 
     it 'run test command with the suffix' do
@@ -208,8 +207,10 @@ describe XCTestRunner do
           Build settings for action test and target Tests:
               SDKROOT = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
               SDK_DIR = /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk
-              BUILT_PRODUCTS_DIR = /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator
+              BUILT_PRODUCTS_DIR = /Users/xxx/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator
               FULL_PRODUCT_NAME = Tests.xctest
+              EXECUTABLE_FOLDER_PATH = Tests.xctest
+              EXECUTABLE_PATH = Tests.xctest/Tests
 
           Build settings for action test and target Demo:
               SDKROOT = xxx
@@ -228,7 +229,7 @@ describe XCTestRunner do
       it 'contains DYLD_ROOT_PATH' do
         @runner.configure_environment('xcodebuild -showBuildSettings test')
         expect(ENV['SDKROOT']).to_not eq 'xxx'
-        expect(ENV['DYLD_ROOT_PATH']).to eq ENV['SDK_DIR']
+        expect(ENV['DYLD_ROOT_PATH']).to eq nil
       end
     end
 
@@ -238,7 +239,15 @@ describe XCTestRunner do
       end
 
       it 'contains test bundle' do
-        expect(@runner.test_command('Self')).to include ' /Users/tokorom/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
+        expect(@runner.test_command('Self')).to include ' /Users/xxx/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
+      end
+
+      it 'contains arch DYLD_ROOT_PATH' do
+        expect(@runner.test_command('Self')).to include "-e DYLD_ROOT_PATH='/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk'"
+      end
+
+      it 'contains arch command' do
+        expect(@runner.test_command('Self')).to include 'arch -arch i386 '
       end
     end
   end

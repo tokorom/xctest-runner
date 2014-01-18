@@ -1,19 +1,28 @@
 require 'xctest-runner'
 
 describe XCTestRunner do
-  class XCTestRunner
-    attr_accessor :last_command
 
-    def execute_command(command, need_puts = false)
-      @last_command = command
-      if command.include?('-showBuildSettings')
-        build_settings
-      elsif command.include?('-list')
-        xcodebuild_list
-      end
+  let(:arguments) {
+    {}
+  }
+
+  let(:runner) {
+    XCTestRunner.new(arguments)
+  }
+
+  let(:opts) {
+    option = runner.build_option
+    opts = {}
+    option.scan(/(-\w+) (\w+)/) do |opt, value|
+      opts[opt] = value
     end
+    opts
+  }
 
-    def build_settings
+  before(:each) do
+    XCTestRunner.any_instance.stub(:execute_command) {
+    }
+    XCTestRunner.any_instance.stub(:execute_command).with(/\s-showBuildSettings/) {
       <<-EOS
         Build settings from command line:
             SDKROOT = iphonesimulator7.0
@@ -21,9 +30,8 @@ describe XCTestRunner do
         Build settings for action test and target Tests:
             HOGE = "huga"
       EOS
-    end
-
-    def xcodebuild_list
+    }
+    XCTestRunner.any_instance.stub(:execute_command).with(/\s-list/) {
       <<-EOS
         Information about project "PodSample":
             Targets:
@@ -38,24 +46,11 @@ describe XCTestRunner do
 
             Schemes:
                 PodSample
-              EOS
-    end
+      EOS
+    }
   end
 
-  let(:opts) {
-    option = @runner.build_option
-    opts = {}
-    option.scan(/(-\w+) (\w+)/) do |opt, value|
-      opts[opt] = value
-    end
-    opts
-  }
-
   context 'Defaults' do
-    before(:each) do
-      @runner = XCTestRunner.new
-    end
-
     it 'runs xcodebuild with default options' do
       expect(opts.count).to eq 3
       expect(opts['-sdk']).to eq 'iphonesimulator'
@@ -64,17 +59,17 @@ describe XCTestRunner do
     end
 
     it 'doese not run clean command' do
-      @runner.should_not_receive(:clean)
-      @runner.should_receive(:build)
-      @runner.should_receive(:test).with('Self')
-      @runner.run
+      expect(runner).to_not receive(:clean)
+      expect(runner).to receive(:build)
+      expect(runner).to receive(:test).with('Self')
+      runner.run
     end
   end
 
   context '-scheme option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:scheme => 'Tests'})
-    end
+    let(:arguments) {
+      {:scheme => 'Tests'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
@@ -83,9 +78,9 @@ describe XCTestRunner do
   end
 
   context '-workspace option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:workspace => 'Sample'})
-    end
+    let(:arguments) {
+      {:workspace => 'Sample'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 4
@@ -94,9 +89,9 @@ describe XCTestRunner do
   end
 
   context '-project option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:project => 'Sample'})
-    end
+    let(:arguments) {
+      {:project => 'Sample'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 4
@@ -105,9 +100,9 @@ describe XCTestRunner do
   end
 
   context '-target option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:target => 'Tests'})
-    end
+    let(:arguments) {
+      {:target => 'Tests'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
@@ -116,9 +111,9 @@ describe XCTestRunner do
   end
 
   context '-sdk option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:sdk => 'iphoneos'})
-    end
+    let(:arguments) {
+      {:sdk => 'iphoneos'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
@@ -127,9 +122,9 @@ describe XCTestRunner do
   end
 
   context '-arch option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:arch => 'i386'})
-    end
+    let(:arguments) {
+      {:arch => 'i386'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 4
@@ -138,9 +133,9 @@ describe XCTestRunner do
   end
 
   context '-configuration option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:configuration => 'Release'})
-    end
+    let(:arguments) {
+      {:configuration => 'Release'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
@@ -149,57 +144,57 @@ describe XCTestRunner do
   end
 
   context '-test option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:test => 'SampleTests/testCase'})
-    end
+    let(:arguments) {
+      {:test => 'SampleTests/testCase'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
     end
 
     it 'run test command with the specific test case' do
-      @runner.run
-      expect(@runner.last_command).to include '-XCTest SampleTests/testCase'
+      expect(runner).to receive(:execute_command).with(/\s-XCTest SampleTests\/testCase/, true)
+      runner.run
     end
   end
 
   context '-clean option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:clean => true})
-    end
+    let(:arguments) {
+      {:clean => true}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
     end
 
     it 'run clean command' do
-      @runner.should_receive(:clean)
-      @runner.should_receive(:build)
-      @runner.should_receive(:test).with('Self')
-      @runner.run
+      expect(runner).to receive(:clean)
+      expect(runner).to receive(:build)
+      expect(runner).to receive(:test).with('Self')
+      runner.run
     end
   end
 
   context '-suffix option' do
-    before(:each) do
-      @runner = XCTestRunner.new({:suffix => 'OBJROOT=.'})
-    end
+    let(:arguments) {
+      {:suffix => 'OBJROOT=.'}
+    }
 
     it 'has some build arguments' do
       expect(opts.count).to eq 3
     end
 
     it 'run test command with the suffix' do
-      @runner.build
-      expect(@runner.last_command).to include ' OBJROOT=.'
-      @runner.test
-      expect(@runner.last_command).to include ' OBJROOT=.'
+      expect(runner).to receive(:execute_command).with(/\sOBJROOT=\./, true)
+      runner.build
+      expect(runner).to receive(:execute_command).with(/\sOBJROOT=\./, true)
+      runner.test
     end
   end
 
   context 'Build environment' do
-    class XCTestRunner
-      def build_settings
+    before(:each) do
+      XCTestRunner.any_instance.stub(:execute_command).with(/\s-showBuildSettings/) {
         <<-EOS
           Build settings from command line:
               SDKROOT = iphonesimulator7.0
@@ -221,16 +216,12 @@ describe XCTestRunner do
               EXECUTABLE_PATH = Tests.xctest/Tests
 
         EOS
-      end
-    end
-
-    before(:each) do
-      @runner = XCTestRunner.new
+      }
     end
 
     context 'ENV' do
-      it 'contains DYLD_ROOT_PATH' do
-        env = @runner.current_environment('xcodebuild -showBuildSettings test')
+      it 'contains environments' do
+        env = runner.current_environment('xcodebuild -showBuildSettings test')
         expect(env['SDKROOT']).to_not eq 'xxx'
         expect(env['SDK_DIR']).to eq '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk'
         expect(env['EXECUTABLE_FOLDER_PATH']).to eq 'Tests.xctest'
@@ -240,20 +231,21 @@ describe XCTestRunner do
 
     context 'test command' do
       it 'contains xctest command' do
-        expect(@runner.test_command('Self')).to include '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/Developer/usr/bin/xctest '
+        expect(runner.test_command('Self')).to include '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/Developer/usr/bin/xctest '
       end
 
       it 'contains test bundle' do
-        expect(@runner.test_command('Self')).to include ' /Users/xxx/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
+        expect(runner.test_command('Self')).to include ' /Users/xxx/Library/Developer/Xcode/DerivedData/XCTestRunner-xxx/Build/Products/Debug-iphonesimulator/Tests.xctest'
       end
 
       it 'contains arch DYLD_ROOT_PATH' do
-        expect(@runner.test_command('Self')).to include "-e DYLD_ROOT_PATH='/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk'"
+        expect(runner.test_command('Self')).to include "-e DYLD_ROOT_PATH='/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk'"
       end
 
       it 'contains arch command' do
-        expect(@runner.test_command('Self')).to include 'arch -arch i386 '
+        expect(runner.test_command('Self')).to include 'arch -arch i386 '
       end
     end
   end
+
 end

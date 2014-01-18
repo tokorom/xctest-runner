@@ -19,13 +19,6 @@ module BuildEnvironment
     env
   end
 
-  def configure_environment(build_command)
-    env = current_environment(build_command)
-    env.each do |key, value|
-      ENV[key] = value
-    end
-  end
-
   def xcodebuild_list
     execute_command("xcodebuild -list")
   end

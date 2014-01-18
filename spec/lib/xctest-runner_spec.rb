@@ -227,9 +227,9 @@ describe XCTestRunner do
 
     context 'ENV' do
       it 'contains DYLD_ROOT_PATH' do
-        @runner.configure_environment('xcodebuild -showBuildSettings test')
-        expect(ENV['SDKROOT']).to_not eq 'xxx'
-        expect(ENV['DYLD_ROOT_PATH']).to eq nil
+        env = @runner.current_environment('xcodebuild -showBuildSettings test')
+        expect(env['SDKROOT']).to_not eq 'xxx'
+        expect(env['DYLD_ROOT_PATH']).to eq nil
       end
     end
 

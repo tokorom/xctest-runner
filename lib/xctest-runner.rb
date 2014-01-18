@@ -129,7 +129,6 @@ class XCTestRunner
   end
 
   def run
-    configure_environment(build_command)
     clean if @clean
     build
     test(@test_class)

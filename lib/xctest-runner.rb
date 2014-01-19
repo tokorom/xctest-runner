@@ -2,10 +2,12 @@
 
 require 'xctest-runner/version'
 require 'xctest-runner/build-environment'
+require 'xctest-runner/scheme-manager'
 require 'xctest-runner/shell'
 
 class XCTestRunner
   include BuildEnvironment
+  include SchemeManager
   include Shell
 
   def initialize(opts = {})
@@ -106,7 +108,7 @@ class XCTestRunner
   end
 
   def build_command
-    "#{xcodebuild} #{build_option}"
+    "#{xcodebuild} build #{build_option}"
   end
 
   def test_command(test_class)
@@ -129,9 +131,15 @@ class XCTestRunner
   end
 
   def run
+    temp_scheme_path = copy_xcscheme_if_need(@scheme)
+    @scheme = temp_scheme if temp_scheme_path
+
     clean if @clean
-    build
-    test(@test_class)
+    if build
+      test(@test_class)
+    end
+
+    remove_scheme(temp_scheme_path) if temp_scheme_path
   end
 
 end

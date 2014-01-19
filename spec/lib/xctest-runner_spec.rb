@@ -227,7 +227,7 @@ describe XCTestRunner do
       }
     end
 
-    context 'ENV' do
+    describe 'ENV' do
       it 'contains environments' do
         env = runner.current_environment('xcodebuild -showBuildSettings test')
         expect(env['SDKROOT']).to_not eq 'xxx'
@@ -237,7 +237,7 @@ describe XCTestRunner do
       end
     end
 
-    context 'test command' do
+    describe 'test command' do
       it 'contains xctest command' do
         expect(runner.test_command('Self')).to include '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.0.sdk/Developer/usr/bin/xctest '
       end
@@ -252,6 +252,290 @@ describe XCTestRunner do
 
       it 'contains arch command' do
         expect(runner.test_command('Self')).to include 'arch -arch i386 '
+      end
+    end
+
+    describe 'SchemeManager' do
+      context 'without scheme' do
+        it 'does not call write_xml' do
+          expect(runner).to_not receive(:write_xml)
+          runner.run
+        end
+      end
+
+      context 'with scheme' do
+        let(:arguments) {
+          {:scheme => 'Tests'}
+        }
+        let (:temp_xml) {
+          double('xml')
+        }
+
+        before(:each) do
+          Find.stub(:find).and_yield('./Tests.xcscheme')
+          File.stub(:open).and_return(xcscheme_xml)
+        end
+
+        context 'need to be updated' do
+          let(:xcscheme_xml) {
+            StringIO.new <<EOS
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Scheme
+     LastUpgradeVersion = "0500"
+     version = "1.3">
+     <BuildAction
+        parallelizeBuildables = "YES"
+        buildImplicitDependencies = "YES">
+        <BuildActionEntries>
+           <BuildActionEntry
+              buildForTesting = "YES"
+              buildForRunning = "YES"
+              buildForProfiling = "YES"
+              buildForArchiving = "YES"
+              buildForAnalyzing = "YES">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSample.app"
+                 BlueprintName = "CocoaPodsProjectSample"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </BuildActionEntry>
+           <BuildActionEntry
+              buildForTesting = "YES"
+              buildForRunning = "NO"
+              buildForProfiling = "NO"
+              buildForArchiving = "NO"
+              buildForAnalyzing = "NO">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7E6188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSampleTests.xctest"
+                 BlueprintName = "CocoaPodsProjectSampleTests"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </BuildActionEntry>
+        </BuildActionEntries>
+     </BuildAction>
+     <TestAction
+        selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+        selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+        shouldUseLaunchSchemeArgsEnv = "YES"
+        buildConfiguration = "Debug">
+        <Testables>
+           <TestableReference
+              skipped = "NO">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7E6188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSampleTests.xctest"
+                 BlueprintName = "CocoaPodsProjectSampleTests"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </TestableReference>
+        </Testables>
+        <MacroExpansion>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </MacroExpansion>
+     </TestAction>
+     <LaunchAction
+        selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+        selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+        launchStyle = "0"
+        useCustomWorkingDirectory = "NO"
+        buildConfiguration = "Debug"
+        ignoresPersistentStateOnLaunch = "NO"
+        debugDocumentVersioning = "YES"
+        allowLocationSimulation = "YES">
+        <BuildableProductRunnable>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </BuildableProductRunnable>
+        <AdditionalOptions>
+        </AdditionalOptions>
+     </LaunchAction>
+     <ProfileAction
+        shouldUseLaunchSchemeArgsEnv = "YES"
+        savedToolIdentifier = ""
+        useCustomWorkingDirectory = "NO"
+        buildConfiguration = "Release"
+        debugDocumentVersioning = "YES">
+        <BuildableProductRunnable>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </BuildableProductRunnable>
+     </ProfileAction>
+     <AnalyzeAction
+        buildConfiguration = "Debug">
+     </AnalyzeAction>
+     <ArchiveAction
+        buildConfiguration = "Release"
+        revealArchiveInOrganizer = "YES">
+     </ArchiveAction>
+  </Scheme>
+EOS
+          }
+
+          describe 'write and unlink' do
+            it 'is called' do
+              expect(File).to receive(:open).with(anything(), 'w').and_return(double('file'))
+              expect(File).to receive(:unlink)
+              runner.run
+            end
+          end
+
+          it 'write temp scheme' do
+            expect(File).to receive(:open).with('./XCTestRunnerTemp.xcscheme', 'w').and_yield(temp_xml)
+            expect(File).to receive(:unlink)
+            expect(temp_xml).to receive(:sync=).with(true)
+            temp_xml.stub(:write) do |xml|
+              expect(xml.to_s).to_not match /buildForRunning\s*=\s*['"NO]+\s+buildForTesting\s*=\s*['"YES]+/
+            end
+            runner.run
+          end
+        end
+
+        context 'need not to be updated' do
+          let(:xcscheme_xml) {
+            StringIO.new <<EOS
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Scheme
+     LastUpgradeVersion = "0500"
+     version = "1.3">
+     <BuildAction
+        parallelizeBuildables = "YES"
+        buildImplicitDependencies = "YES">
+        <BuildActionEntries>
+           <BuildActionEntry
+              buildForTesting = "YES"
+              buildForRunning = "YES"
+              buildForProfiling = "YES"
+              buildForArchiving = "YES"
+              buildForAnalyzing = "YES">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSample.app"
+                 BlueprintName = "CocoaPodsProjectSample"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </BuildActionEntry>
+           <BuildActionEntry
+              buildForTesting = "YES"
+              buildForRunning = "YES"
+              buildForProfiling = "NO"
+              buildForArchiving = "NO"
+              buildForAnalyzing = "NO">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7E6188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSampleTests.xctest"
+                 BlueprintName = "CocoaPodsProjectSampleTests"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </BuildActionEntry>
+        </BuildActionEntries>
+     </BuildAction>
+     <TestAction
+        selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+        selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+        shouldUseLaunchSchemeArgsEnv = "YES"
+        buildConfiguration = "Debug">
+        <Testables>
+           <TestableReference
+              skipped = "NO">
+              <BuildableReference
+                 BuildableIdentifier = "primary"
+                 BlueprintIdentifier = "06D7A7E6188AC90900D09064"
+                 BuildableName = "CocoaPodsProjectSampleTests.xctest"
+                 BlueprintName = "CocoaPodsProjectSampleTests"
+                 ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+              </BuildableReference>
+           </TestableReference>
+        </Testables>
+        <MacroExpansion>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </MacroExpansion>
+     </TestAction>
+     <LaunchAction
+        selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+        selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+        launchStyle = "0"
+        useCustomWorkingDirectory = "NO"
+        buildConfiguration = "Debug"
+        ignoresPersistentStateOnLaunch = "NO"
+        debugDocumentVersioning = "YES"
+        allowLocationSimulation = "YES">
+        <BuildableProductRunnable>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </BuildableProductRunnable>
+        <AdditionalOptions>
+        </AdditionalOptions>
+     </LaunchAction>
+     <ProfileAction
+        shouldUseLaunchSchemeArgsEnv = "YES"
+        savedToolIdentifier = ""
+        useCustomWorkingDirectory = "NO"
+        buildConfiguration = "Release"
+        debugDocumentVersioning = "YES">
+        <BuildableProductRunnable>
+           <BuildableReference
+              BuildableIdentifier = "primary"
+              BlueprintIdentifier = "06D7A7C2188AC90900D09064"
+              BuildableName = "CocoaPodsProjectSample.app"
+              BlueprintName = "CocoaPodsProjectSample"
+              ReferencedContainer = "container:CocoaPodsProjectSample.xcodeproj">
+           </BuildableReference>
+        </BuildableProductRunnable>
+     </ProfileAction>
+     <AnalyzeAction
+        buildConfiguration = "Debug">
+     </AnalyzeAction>
+     <ArchiveAction
+        buildConfiguration = "Release"
+        revealArchiveInOrganizer = "YES">
+     </ArchiveAction>
+  </Scheme>
+EOS
+          }
+
+          describe 'write and unlink' do
+            it 'is not called' do
+              expect(File).to_not receive(:open).with(anything(), 'w')
+              expect(File).to_not receive(:unlink)
+              runner.run
+            end
+          end
+        end
+
       end
     end
   end

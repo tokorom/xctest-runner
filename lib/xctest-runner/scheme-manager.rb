@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-require 'xctest-runner/scheme-manager'
 require 'find'
 require 'rexml/document'
 
@@ -38,7 +37,7 @@ class XCTestRunner
 
     def find_xml_need_to_be_updated(scheme_path, &block)
       need_to_be_updated = false
-      doc = REXML::Document.new(open(scheme_path))
+      doc = REXML::Document.new(File.open(scheme_path))
       doc.elements.each('Scheme/BuildAction/BuildActionEntries/BuildActionEntry') do |element|
         if 'YES' == element.attributes['buildForTesting'] && 'NO' == element.attributes['buildForRunning']
           element.attributes['buildForRunning'] = 'YES'

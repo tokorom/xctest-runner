@@ -21,6 +21,7 @@ describe XCTestRunner do
 
   before(:each) do
     XCTestRunner.any_instance.stub(:execute_command) {
+      true
     }
     XCTestRunner.any_instance.stub(:execute_command).with(/\s-showBuildSettings/) {
       <<-EOS
@@ -60,7 +61,7 @@ describe XCTestRunner do
 
     it 'doese not run clean command' do
       expect(runner).to_not receive(:clean)
-      expect(runner).to receive(:build)
+      expect(runner).to receive(:build).and_return(true)
       expect(runner).to receive(:test).with('Self')
       runner.run
     end
@@ -169,8 +170,15 @@ describe XCTestRunner do
 
     it 'run clean command' do
       expect(runner).to receive(:clean)
-      expect(runner).to receive(:build)
+      expect(runner).to receive(:build).and_return(true)
       expect(runner).to receive(:test).with('Self')
+      runner.run
+    end
+
+    it 'would not run test command if build returns false' do
+      expect(runner).to receive(:clean)
+      expect(runner).to receive(:build).and_return(false)
+      expect(runner).to_not receive(:test).with('Self')
       runner.run
     end
   end

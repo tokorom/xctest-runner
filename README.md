@@ -52,6 +52,12 @@ $ xctest-runner -project Sample.xcodeproj
 
 ## Advanced Usage
 
+### If you would like to use [CocoaPods](http://cocoapods.org/)
+
+```shell
+$ xctest-runner -workspace YourCocoaPods.xcworkspace -scheme YourProjectScheme
+```
+
 ### If you would like to use [xcpretty](https://github.com/mneorr/XCPretty)
 
 ```shell

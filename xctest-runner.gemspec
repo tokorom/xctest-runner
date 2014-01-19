@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "xctest-runner"
-  s.version = "0.2.0"
+  s.version = "1.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["tokorom"]
-  s.date = "2014-01-13"
+  s.date = "2014-01-19"
   s.description = "The unit tests runner for xctest"
   s.email = "tokorom@gmail.com"
   s.executables = ["xctest-runner"]
@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     ".rspec",
+    ".travis.yml",
     "Gemfile",
     "Guardfile",
     "LICENSE.txt",
@@ -29,6 +30,7 @@ Gem::Specification.new do |s|
     "bin/xctest-runner",
     "lib/xctest-runner.rb",
     "lib/xctest-runner/build-environment.rb",
+    "lib/xctest-runner/scheme-manager.rb",
     "lib/xctest-runner/shell.rb",
     "lib/xctest-runner/version.rb",
     "spec/lib/xctest-runner_spec.rb",

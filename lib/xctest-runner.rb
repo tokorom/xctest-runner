@@ -39,16 +39,20 @@ class XCTestRunner
     @executable_path ||= "#{@env['BUILT_PRODUCTS_DIR']}/#{@env['EXECUTABLE_PATH']}"
   end
 
+  def is_valid_arch?(arch)
+    ['i386', 'x86_64'].include?(arch)
+  end
+
   def native_arch
     unless @native_arch
       arch = `file #{executable_path}`.split(' ').last
-      if 'i386' == arch || 'x86_64' == arch
+      if is_valid_arch?(arch)
         @native_arch = arch
       else
         @native_arch = @env['CURRENT_ARCH']
       end
     end
-    @native_arch || 'i386'
+    is_valid_arch?(@native_arch) ? @native_arch : 'i386'
   end
 
   def arch_command

@@ -24,23 +24,23 @@ class XCTestRunner
       execute_command("xcodebuild -list")
     end
 
-    def default_target
-      unless @default_target
-        target = nil
-        is_target = false
+    def default_scheme
+      unless @default_scheme
+        scheme = nil
+        is_scheme = false
 
         output = xcodebuild_list
         output.each_line do |line|
           line = line.strip
           if line =~ /\w+:/
-            is_target = ('Targets:' == line)
-          elsif is_target
-            target = line if target.nil? || line.end_with?('Tests')
+            is_scheme = ('Schemes:' == line)
+          elsif is_scheme
+            scheme = line if scheme.nil? || line.end_with?('Tests')
           end
         end
-        @default_target = target
+        @default_scheme = scheme
       end
-      @default_target
+      @default_scheme
     end
 
   end

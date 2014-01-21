@@ -18,18 +18,12 @@ $ gem install xctest-runner
 $ xctest-runner
 ```
 
-xctest-runner may be able to find the appropriate Target automatically.
+xctest-runner may be able to find the appropriate Scheme automatically.
 
 ### If you would like to run a specific test case
 
 ```shell
 $ xctest-runner -test SampleTests/testSample
-```
-
-### If you specify a target
-
-```shell
-$ xctest-runner -target YourTestsTarget
 ```
 
 ### If you specify a scheme
@@ -42,12 +36,6 @@ $ xctest-runner -scheme YourScheme
 
 ```shell
 $ xctest-runner -workspace Sample.xcworkspace
-```
-
-### If you specify a project
-
-```shell
-$ xctest-runner -project Sample.xcodeproj
 ```
 
 ## Advanced Usage

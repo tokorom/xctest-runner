@@ -47,6 +47,7 @@ describe XCTestRunner do
 
             Schemes:
                 PodSample
+                Tests
       EOS
     }
   end
@@ -56,7 +57,7 @@ describe XCTestRunner do
       expect(opts.count).to eq 3
       expect(opts['-sdk']).to eq 'iphonesimulator'
       expect(opts['-configuration']).to eq 'Debug'
-      expect(opts['-target']).to eq 'PodSampleTests'
+      expect(opts['-scheme']).to eq 'Tests'
     end
 
     it 'doese not run clean command' do
@@ -86,28 +87,6 @@ describe XCTestRunner do
     it 'has some build arguments' do
       expect(opts.count).to eq 4
       expect(opts['-workspace']).to eq 'Sample'
-    end
-  end
-
-  context '-project option' do
-    let(:arguments) {
-      {:project => 'Sample'}
-    }
-
-    it 'has some build arguments' do
-      expect(opts.count).to eq 4
-      expect(opts['-project']).to eq 'Sample'
-    end
-  end
-
-  context '-target option' do
-    let(:arguments) {
-      {:target => 'Tests'}
-    }
-
-    it 'has some build arguments' do
-      expect(opts.count).to eq 3
-      expect(opts['-target']).to eq 'Tests'
     end
   end
 

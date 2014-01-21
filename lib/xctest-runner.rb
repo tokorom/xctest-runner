@@ -14,8 +14,6 @@ class XCTestRunner
     @clean = opts[:clean] || false
     @scheme = opts[:scheme] || nil
     @workspace = opts[:workspace] || nil
-    @project = opts[:project] || nil
-    @target = opts[:target] || nil
     @sdk = opts[:sdk] || 'iphonesimulator'
     @configuration = opts[:configuration] || 'Debug'
     @arch = opts[:arch] || nil
@@ -24,6 +22,7 @@ class XCTestRunner
 
     @env = current_environment(build_command)
     @arch = default_build_arch if @arch.nil?
+    @scheme = default_scheme unless @scheme
     @build_option = nil
   end
 
@@ -83,12 +82,9 @@ class XCTestRunner
       options = []
       options << "-scheme #{@scheme}" if @scheme
       options << "-workspace #{@workspace}" if @workspace
-      options << "-project #{@project}" if @project
-      options << "-target #{@target}" if @target
       options << "-sdk #{@sdk}" if @sdk
       options << "-configuration #{@configuration}" if @configuration
       options << "-arch #{@arch} #{valid_archs}" if @arch
-      options << "-target #{default_target}" if @scheme.nil? && @target.nil? && default_target
       @build_option = options.join(' ')
     end
     @build_option

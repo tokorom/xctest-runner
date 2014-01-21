@@ -20,16 +20,16 @@ class XCTestRunner
       env
     end
 
-    def xcodebuild_list
-      execute_command("xcodebuild -list")
+    def xcodebuild_list(build_command)
+      execute_command("#{build_command} -list")
     end
 
-    def default_scheme
+    def default_scheme(build_command)
       unless @default_scheme
         scheme = nil
         is_scheme = false
 
-        output = xcodebuild_list
+        output = xcodebuild_list(build_command)
         output.each_line do |line|
           line = line.strip
           if line =~ /\w+:/

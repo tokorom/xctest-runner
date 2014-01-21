@@ -32,6 +32,12 @@ $ xctest-runner -test SampleTests/testSample
 $ xctest-runner -scheme YourScheme
 ```
 
+### If you specify a project
+
+```shell
+$ xctest-runner -project Sample.xcodeproj
+```
+
 ### If you specify a workspace
 
 ```shell

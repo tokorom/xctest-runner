@@ -11,6 +11,7 @@ require 'optparse'
 opts = {}
 opt = OptionParser.new
 opt.on('--scheme NAME', 'build the scheme NAME') {|v| opts[:scheme] = v }
+opt.on('--project NAME', 'build the project NAME') {|v| opts[:project] = v }
 opt.on('--workspace NAME', 'build the workspace NAME') {|v| opts[:workspace] = v }
 opt.on('--sdk SDK', 'use SDK as the name or path of the base SDK when building the project') {|v| opts[:sdk] = v }
 opt.on('--arch ARCH', 'build each target for the architecture ARCH') {|v| opts[:arch] = v }

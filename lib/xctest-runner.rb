@@ -13,6 +13,7 @@ class XCTestRunner
   def initialize(opts = {})
     @clean = opts[:clean] || false
     @scheme = opts[:scheme] || nil
+    @project = opts[:project] || nil
     @workspace = opts[:workspace] || nil
     @sdk = opts[:sdk] || 'iphonesimulator'
     @configuration = opts[:configuration] || 'Debug'
@@ -20,7 +21,7 @@ class XCTestRunner
     @test_class = opts[:test] || 'Self'
     @suffix = opts[:suffix] || ''
 
-    @scheme = default_scheme unless @scheme
+    @scheme = default_scheme(build_command) unless @scheme
     @env = current_environment(build_command)
     @arch = default_build_arch if @arch.nil?
     @build_option = nil
@@ -81,6 +82,7 @@ class XCTestRunner
     unless @build_option
       options = []
       options << "-scheme #{@scheme}" if @scheme
+      options << "-project #{@project}" if @project
       options << "-workspace #{@workspace}" if @workspace
       options << "-sdk #{@sdk}" if @sdk
       options << "-configuration #{@configuration}" if @configuration

@@ -90,6 +90,17 @@ describe XCTestRunner do
     end
   end
 
+  context '-project option' do
+    let(:arguments) {
+      {:project => 'Sample'}
+    }
+
+    it 'has some build arguments' do
+      expect(opts.count).to eq 4
+      expect(opts['-project']).to eq 'Sample'
+    end
+  end
+
   context '-sdk option' do
     let(:arguments) {
       {:sdk => 'iphoneos'}

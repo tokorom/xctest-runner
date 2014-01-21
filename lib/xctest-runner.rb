@@ -20,9 +20,9 @@ class XCTestRunner
     @test_class = opts[:test] || 'Self'
     @suffix = opts[:suffix] || ''
 
+    @scheme = default_scheme unless @scheme
     @env = current_environment(build_command)
     @arch = default_build_arch if @arch.nil?
-    @scheme = default_scheme unless @scheme
     @build_option = nil
   end
 
@@ -108,7 +108,7 @@ class XCTestRunner
   end
 
   def build_command
-    "#{xcodebuild} build #{build_option}"
+    "#{xcodebuild} #{build_option}"
   end
 
   def test_command(test_class)

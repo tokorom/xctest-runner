@@ -9,6 +9,10 @@ class XCTestRunner
     TEMP_SCHEME = 'XCTestRunnerTemp'
     TEMP_SCHEME_NAME = "#{TEMP_SCHEME}.xcscheme"
 
+    BUILD_ACTION_TAG = 'Scheme/BuildAction'
+    BUILD_ACTION_ENTRY_TAG = 'Scheme/BuildAction/BuildActionEntries/BuildActionEntry'
+    TEST_REFERENCE_TAG = 'Scheme/TestAction/Testables/TestableReference/BuildableReference'
+
     def temp_scheme
       TEMP_SCHEME
     end
@@ -38,13 +42,35 @@ class XCTestRunner
     def find_xml_need_to_be_updated(scheme_path, &block)
       need_to_be_updated = false
       doc = REXML::Document.new(File.open(scheme_path))
-      doc.elements.each('Scheme/BuildAction/BuildActionEntries/BuildActionEntry') do |element|
-        if element.attributes['buildForTesting'] != element.attributes['buildForRunning']
-          element.attributes['buildForRunning'] = element.attributes['buildForTesting']
-          need_to_be_updated = true
+      if doc.get_elements(BUILD_ACTION_ENTRY_TAG).empty?
+        need_to_be_updated = add_build_action_entry_to(doc)
+      else
+        doc.elements.each(BUILD_ACTION_ENTRY_TAG) do |element|
+          if element.attributes['buildForTesting'] != element.attributes['buildForRunning']
+            element.attributes['buildForRunning'] = element.attributes['buildForTesting']
+            need_to_be_updated = true
+          end
         end
       end
       block.call(doc) if need_to_be_updated
+    end
+
+    def add_build_action_entry_to(doc)
+      buildable_reference = doc.get_elements(TEST_REFERENCE_TAG).first
+      return false unless buildable_reference
+      build_action = doc.get_elements(BUILD_ACTION_TAG).first
+      return false unless build_action
+      entries = build_action.add_element('BuildActionEntries')
+      attributes = {
+        'buildForTesting' => 'YES',
+        'buildForRunning' => 'YES',
+        'buildForProfiling' => 'NO',
+        'buildForArchiving' => 'NO',
+        'buildForAnalyzing' => 'NO',
+      }
+      entry = entries.add_element('BuildActionEntry', attributes)
+      entry.add_element(buildable_reference.name, buildable_reference.attributes)
+      true
     end
 
     def write_xml(doc, path)

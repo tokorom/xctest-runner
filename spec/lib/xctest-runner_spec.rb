@@ -405,7 +405,10 @@ EOS
             expect(File).to receive(:unlink)
             expect(temp_xml).to receive(:sync=).with(true)
             temp_xml.stub(:write) do |xml|
-              expect(xml.to_s).to_not match /buildForRunning\s*=\s*['"NO]+\s+buildForTesting\s*=\s*['"YES]+/
+              entry = xml.get_elements('Scheme/BuildAction/BuildActionEntries/BuildActionEntry').first
+              expect(entry).to_not be_nil
+              expect(entry.attributes['buildForTesting']).to eq('YES')
+              expect(entry.attributes['buildForRunning']).to eq('YES')
             end
             runner.run
           end
@@ -533,6 +536,87 @@ EOS
               expect(File).to_not receive(:unlink)
               runner.run
             end
+          end
+        end
+
+        context 'build action entries is not exist' do
+          let(:xcscheme_xml) {
+            StringIO.new <<EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "0500"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+   </BuildAction>
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Debug">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "xxxxxxx"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
+               ReferencedContainer = "container:XXX.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Debug"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      allowLocationSimulation = "YES">
+      <AdditionalOptions>
+      </AdditionalOptions>
+   </LaunchAction>
+   <ProfileAction
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      buildConfiguration = "Debug"
+      debugDocumentVersioning = "YES">
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Debug"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>
+EOS
+          }
+
+          describe 'write and unlink' do
+            it 'is called' do
+              expect(File).to receive(:open).with(anything(), 'w')
+              expect(File).to receive(:unlink)
+              runner.run
+            end
+          end
+
+          it 'write temp scheme' do
+            expect(File).to receive(:open).with('./XCTestRunnerTemp.xcscheme', 'w').and_yield(temp_xml)
+            expect(File).to receive(:unlink)
+            expect(temp_xml).to receive(:sync=).with(true)
+            temp_xml.stub(:write) do |xml|
+              entry = xml.get_elements('Scheme/BuildAction/BuildActionEntries/BuildActionEntry').first
+              expect(entry).to_not be_nil
+              expect(entry.attributes['buildForTesting']).to eq('YES')
+              expect(entry.attributes['buildForRunning']).to eq('YES')
+            end
+            runner.run
           end
         end
 

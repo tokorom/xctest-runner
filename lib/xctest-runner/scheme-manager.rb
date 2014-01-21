@@ -39,8 +39,8 @@ class XCTestRunner
       need_to_be_updated = false
       doc = REXML::Document.new(File.open(scheme_path))
       doc.elements.each('Scheme/BuildAction/BuildActionEntries/BuildActionEntry') do |element|
-        if 'YES' == element.attributes['buildForTesting'] && 'NO' == element.attributes['buildForRunning']
-          element.attributes['buildForRunning'] = 'YES'
+        if element.attributes['buildForTesting'] != element.attributes['buildForRunning']
+          element.attributes['buildForRunning'] = element.attributes['buildForTesting']
           need_to_be_updated = true
         end
       end

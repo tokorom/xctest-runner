@@ -64,8 +64,11 @@ $ xctest-runner 2>&1 | xcpretty -c
 $ xctest-runner -suffix "OBJROOT=."
 ```
 
+## License
+
+MIT
+
 ## Copyright
 
-Copyright (c) 2014 tokorom. See LICENSE.txt for
-further details.
+Copyright (c) 2014 tokorom.
 

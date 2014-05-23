@@ -32,7 +32,9 @@ class XCTestRunner
   end
 
   def bundle_path
-    @bundle_path ||= "#{@env['BUILT_PRODUCTS_DIR']}/#{@env['EXECUTABLE_FOLDER_PATH']}"
+    executableFolderPath = find_buildable_name_for_testaction(@scheme)
+    executableFolderPath = @env['EXECUTABLE_FOLDER_PATH'] unless executableFolderPath
+    @bundle_path ||= "#{@env['BUILT_PRODUCTS_DIR']}/#{executableFolderPath}"
   end
 
   def executable_path
@@ -129,7 +131,7 @@ class XCTestRunner
 
   def test(test_class = 'Self')
     command = test_command(test_class)
-    execute_command("#{command} #{@suffix}", true)
+    execute_command("#{command} #{@suffix} 2>&1", true)
   end
 
   def run

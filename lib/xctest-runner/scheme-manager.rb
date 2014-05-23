@@ -73,6 +73,16 @@ class XCTestRunner
       true
     end
 
+    def find_buildable_name_for_testaction(scheme)
+      return nil unless scheme
+      scheme_path = scheme_path_for(scheme)
+      return nil unless scheme_path
+      doc = REXML::Document.new(File.open(scheme_path))
+      buildable_reference = doc.get_elements(TEST_REFERENCE_TAG).first
+      return false unless buildable_reference
+      return buildable_reference.attributes['BuildableName']
+    end
+
     def write_xml(doc, path)
       File.open(path, 'w') do |f|
         f.sync = true
